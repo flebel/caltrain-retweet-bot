@@ -9,8 +9,7 @@ path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 config = ConfigParser.SafeConfigParser()
 config.read(os.path.join(path, 'config'))
 
-# your hashtag or search query and tweet language (empty = all languages)
-hashtag = config.get('settings', 'search_query')
+search_query = config.get('settings', 'search_query')
 tweet_language = config.get('settings', 'tweet_language')
 
 # blacklisted users and words
@@ -18,8 +17,8 @@ user_blacklist = []
 word_blacklist = ['RT', u'♺']
 
 # build savepoint path + file
-hashed_hashtag = hashlib.md5(hashtag).hexdigest()
-last_id_filename = 'last_id_hashtag_%s' % hashed_hashtag
+hashed_search_query = hashlib.md5(search_query).hexdigest()
+last_id_filename = 'last_id_search_query_%s' % hashed_search_query
 rt_bot_path = os.path.dirname(os.path.abspath(__file__))
 last_id_file = os.path.join(rt_bot_path, last_id_filename)
 
@@ -37,7 +36,7 @@ except IOError:
     print 'No savepoint found. Trying to get as many results as possible.'
 
 # search query
-timelineIterator = tweepy.Cursor(api.search, q=hashtag, since_id=savepoint, lang=tweet_language).items()
+timelineIterator = tweepy.Cursor(api.search, q=search_query, since_id=savepoint, lang=tweet_language).items()
 
 # put everything into a list to be able to sort/filter
 timeline = []
