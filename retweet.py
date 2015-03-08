@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os, ConfigParser, tweepy, inspect, hashlib
+import ConfigParser
+import hashlib
+import inspect
+import os
+
+import tweepy
 
 path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
@@ -77,4 +82,3 @@ print 'Finished. %d Tweets retweeted, %d errors occured.' % (tw_counter, err_cou
 # write last retweeted tweet id to file
 with open(last_id_file, 'w') as file:
     file.write(str(last_tweet_id))
-
