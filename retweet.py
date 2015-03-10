@@ -10,29 +10,26 @@ import tweepy
 
 path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
-# read config
 config = ConfigParser.SafeConfigParser()
 config.read(os.path.join(path, 'config'))
 
 search_query = config.get('settings', 'search_query')
 tweet_language = config.get('settings', 'tweet_language')
 
-# blacklisted users and words
 user_blacklist = []
 word_blacklist = ['RT', u'♺']
 
-# build savepoint path + file
+# Build savepoint path + file
 hashed_search_query = hashlib.md5(search_query).hexdigest()
 last_id_filename = 'last_id_search_query_%s' % hashed_search_query
 rt_bot_path = os.path.dirname(os.path.abspath(__file__))
 last_id_file = os.path.join(rt_bot_path, last_id_filename)
 
-# create bot
 auth = tweepy.OAuthHandler(config.get('twitter', 'consumer_key'), config.get('twitter', 'consumer_secret'))
 auth.set_access_token(config.get('twitter', 'access_token'), config.get('twitter', 'access_token_secret'))
 api = tweepy.API(auth)
 
-# retrieve last savepoint if available
+# Retrieve last savepoint if available
 try:
     with open(last_id_file, 'r') as file:
         savepoint = file.read()
@@ -40,10 +37,9 @@ except IOError:
     savepoint = ''
     print 'No savepoint found. Trying to get as many results as possible.'
 
-# search query
+# Search query
 timelineIterator = tweepy.Cursor(api.search, q=search_query, since_id=savepoint, lang=tweet_language).items()
 
-# put everything into a list to be able to sort/filter
 timeline = []
 for status in timelineIterator:
     timeline.append(status)
@@ -53,7 +49,7 @@ try:
 except IndexError:
     last_tweet_id = savepoint
 
-# filter @replies/blacklisted words & users out and reverse timeline
+# Filter @replies/blacklisted words & users out and reverse timeline
 timeline = filter(lambda status: status.text[0] != '@', timeline)
 timeline = filter(lambda status: not any(word in status.text.split() for word in word_blacklist), timeline)
 timeline = filter(lambda status: status.author.screen_name not in user_blacklist, timeline)
@@ -62,7 +58,6 @@ timeline.reverse()
 tw_counter = 0
 err_counter = 0
 
-# iterate the timeline and retweet
 for status in timeline:
     try:
         print '(%(date)s) %(name)s: %(message)s\n' % \
@@ -73,12 +68,13 @@ for status in timeline:
         api.retweet(status.id)
         tw_counter += 1
     except tweepy.error.TweepError as e:
-        # just in case tweet got deleted in the meantime or already retweeted
+        # Just in case tweet got deleted in the meantime or already retweeted
         err_counter += 1
         continue
 
 print 'Finished. %d Tweets retweeted, %d errors occured.' % (tw_counter, err_counter)
 
-# write last retweeted tweet id to file
+# Persist savepoint
 with open(last_id_file, 'w') as file:
     file.write(str(last_tweet_id))
+
