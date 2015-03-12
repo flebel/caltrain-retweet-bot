@@ -40,9 +40,7 @@ except IOError:
 # Search query
 timelineIterator = tweepy.Cursor(api.search, q=search_query, since_id=savepoint, lang=tweet_language).items()
 
-timeline = []
-for status in timelineIterator:
-    timeline.append(status)
+timeline = list(timelineIterator)
 
 try:
     last_tweet_id = timeline[0].id
