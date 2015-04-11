@@ -17,7 +17,7 @@ search_query = config.get('settings', 'search_query')
 tweet_language = config.get('settings', 'tweet_language')
 
 user_blacklist = []
-word_blacklist = ['RT', u'♺']
+word_blacklist = ['RT']
 
 # Build savepoint path + file
 hashed_search_query = hashlib.md5(search_query).hexdigest()
