@@ -1,7 +1,7 @@
 [settings]
-search_query:test
-# Leave empty for all languages
-tweet_language:
+number_tweets_per_minute:30
+screen_name:Caltrain_News
+search_terms:000
 
 # Create your app on http://apps.twitter.com
 [twitter]

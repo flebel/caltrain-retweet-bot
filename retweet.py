@@ -8,20 +8,22 @@ import os
 
 import tweepy
 
+from itertools import product
+
+
 path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
 config = ConfigParser.SafeConfigParser()
 config.read(os.path.join(path, 'config'))
 
-search_query = config.get('settings', 'search_query')
-tweet_language = config.get('settings', 'tweet_language')
+screen_name = config.get('settings', 'screen_name')
 
 user_blacklist = []
 word_blacklist = ['RT']
 
 # Build savepoint path + file
-hashed_search_query = hashlib.md5(search_query).hexdigest()
-last_id_filename = 'last_id_search_query_%s' % hashed_search_query
+hashed_screen_name = hashlib.md5(screen_name).hexdigest()
+last_id_filename = 'last_id_screen_name_%s' % hashed_screen_name
 rt_bot_path = os.path.dirname(os.path.abspath(__file__))
 last_id_file = os.path.join(rt_bot_path, last_id_filename)
 
@@ -37,28 +39,23 @@ except IOError:
     savepoint = ''
     print 'No savepoint found. Trying to get as many results as possible.'
 
-# Search query
-timelineIterator = tweepy.Cursor(api.search, q=search_query, since_id=savepoint, lang=tweet_language).items()
-
-timeline = list(timelineIterator)
+statuses = api.user_timeline(screen_name=screen_name, count=config.get('settings', 'number_tweets_per_minute'))
 
 try:
-    last_tweet_id = timeline[0].id
+    last_tweet_id = statuses[0].id
 except IndexError:
     last_tweet_id = savepoint
 
-# Filter @replies/blacklisted words & users out and reverse timeline
-timeline = filter(lambda status: status.text[0] != '@', timeline)
-timeline = filter(lambda status: not any(word in status.text.split() for word in word_blacklist), timeline)
-timeline = filter(lambda status: status.author.screen_name not in user_blacklist, timeline)
-timeline.reverse()
+search_terms = filter(None, config.get('settings', 'search_terms').split(','))
 
 tw_counter = 0
 err_counter = 0
 
-for status in timeline:
+for status, search_term in product(statuses, search_terms):
+    if last_tweet_id <= status.id or not search_term in status.text:
+        continue
     try:
-        print '(%(date)s) %(name)s: %(message)s\n' % \
+        print 'Retweeted (%(date)s) %(name)s: %(message)s\n' % \
             { 'date' : status.created_at,
             'name' : status.author.screen_name.encode('utf-8'),
             'message' : status.text.encode('utf-8') }
