@@ -1,5 +1,5 @@
 [settings]
-number_tweets_per_minute:30
+number_tweets_to_retrieve:10
 screen_name:Caltrain_News
 search_terms:000
 

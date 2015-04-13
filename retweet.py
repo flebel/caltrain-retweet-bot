@@ -31,15 +31,20 @@ auth = tweepy.OAuthHandler(config.get('twitter', 'consumer_key'), config.get('tw
 auth.set_access_token(config.get('twitter', 'access_token'), config.get('twitter', 'access_token_secret'))
 api = tweepy.API(auth)
 
+timeline_kwargs = {
+    'count': config.get('settings', 'number_tweets_to_retrieve'),
+}
+
 # Retrieve last savepoint if available
 try:
     with open(last_id_file, 'r') as file:
         savepoint = file.read()
+    timeline_kwargs['since_id'] = savepoint
 except IOError:
     savepoint = ''
     print 'No savepoint found. Trying to get as many results as possible.'
 
-statuses = api.user_timeline(screen_name=screen_name, count=config.get('settings', 'number_tweets_per_minute'))
+statuses = api.user_timeline(screen_name, **timeline_kwargs)
 
 try:
     last_tweet_id = statuses[0].id
@@ -52,7 +57,7 @@ tw_counter = 0
 err_counter = 0
 
 for status, search_term in product(statuses, search_terms):
-    if last_tweet_id <= status.id or not search_term in status.text:
+    if not search_term in status.text:
         continue
     try:
         print 'Retweeted (%(date)s) %(name)s: %(message)s\n' % \
