@@ -4,7 +4,6 @@
 import argparse
 import ConfigParser
 import os
-from itertools import product
 
 import tweepy
 
@@ -53,8 +52,8 @@ def main(config_file):
     tw_counter = 0
     err_counter = 0
 
-    for status, search_term in product(statuses, search_terms):
-        if not search_term in status.text:
+    for status in statuses:
+        if not any([term for term in search_terms if term in status.text]):
             continue
         try:
             print 'Retweeted (%(date)s) %(name)s: %(message)s\n' % \
