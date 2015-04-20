@@ -1,14 +1,12 @@
-Python Retweet Bot
-==================
+Caltrain retweet bot
+====================
 
-This script retweets all Tweets containing your search term. To limit Twitter requests a savepoint file marks Tweets found before. It's Twitter API v1.1 ready.
+Retweet a given account's tweets containing certain search terms.
 
-How to start:
--------------
-* Depends on http://tweepy.github.com/ (pip install tweepy)
-* Copy 'config.sample' to 'config'
-* Define your hashtag or search query
-* Add your Twitter app credentials
-* (Tune some other options if you like)
-* $ python retweet.py
-* Add this call to your crontab (or something similar) to retweet all new tweets regularly
+Getting started
+---------------
+* `pip install -r requirements.txt`
+* Copy `default.conf.sample` to `default.conf`
+* Set search settings: `screen_name` and `search_terms`
+* Set Twitter app tokens
+* Run script frequently (e.g. every minute through a cron job) to retweet `number_of_tweets_to_retrieve` most recent tweets containing at least one of the search terms
