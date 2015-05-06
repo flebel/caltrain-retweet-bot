@@ -49,26 +49,26 @@ def main(config_file):
 
     search_terms = filter(None, config.get('settings', 'search_terms').split(','))
 
-    tw_counter = 0
-    err_counter = 0
+    counters = {'retweeted': 0, 'errors': 0}
 
     for status in statuses:
         if not any([term for term in search_terms if term in status.text]):
             continue
         try:
             print 'Retweeted (%(date)s) %(name)s: %(message)s\n' % \
-                { 'date' : status.created_at,
-                'name' : status.author.screen_name.encode('utf-8'),
-                'message' : status.text.encode('utf-8') }
-
+                {
+                    'date': status.created_at,
+                    'message': status.text.encode('utf-8'),
+                    'name': status.author.screen_name.encode('utf-8'),
+                }
             api.retweet(status.id)
-            tw_counter += 1
-        except tweepy.error.TweepError as e:
+            counters['retweeted'] += 1
+        except (tweepy.error.TweepError,) as e:
             # Just in case tweet got deleted in the meantime or already retweeted
-            err_counter += 1
+            counters['errors'] += 1
             continue
 
-    print 'Finished. %d Tweets retweeted, %d errors occured.' % (tw_counter, err_counter)
+    print '%d retweeted, %d errors occurred.' % (counters['retweeted'], counters['errors'])
 
     # Persist savepoint
     with open(last_id_file, 'w') as file:
