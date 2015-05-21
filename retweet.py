@@ -68,7 +68,7 @@ def main(config_file):
             counters['errors'] += 1
             continue
 
-    print '%d retweeted, %d errors occurred.' % (counters['retweeted'], counters['errors'])
+    print '%(retweeted)d retweeted, %(errors)d errors occurred.' % counters
 
     # Persist savepoint
     with open(last_id_file, 'w') as file:
