@@ -14,6 +14,7 @@ COUNT_TYPES = namedtuple('COUNT_TYPES', ('errors', 'retweeted',))
 
 parser = argparse.ArgumentParser(description="Retweet a user's tweets matching search terms.")
 parser.add_argument('--config', default='default.conf', dest='config', help='Configuration file')
+parser.add_argument('--dry-run', action='store_true', default=False, dest='dry_run', help='Do not perform retweet')
 
 
 def construct_last_id_filename(config_filename):
@@ -42,7 +43,7 @@ def construct_api(access_token, access_token_secret, consumer_key, consumer_secr
     auth.set_access_token(access_token, access_token_secret)
     return tweepy.API(auth)
 
-def run(api, last_id_filename, number_tweets_to_retrieve, screen_name, search_terms):
+def run(api, last_id_filename, number_tweets_to_retrieve, retweet, screen_name, search_terms):
     rt_bot_path = os.path.dirname(os.path.abspath(__file__))
     last_id_file_path = os.path.join(rt_bot_path, last_id_filename)
 
@@ -68,7 +69,8 @@ def run(api, last_id_filename, number_tweets_to_retrieve, screen_name, search_te
                     'message': status.text.encode('utf-8'),
                     'name': status.author.screen_name.encode('utf-8'),
                 }
-            api.retweet(status.id)
+            if not retweet:
+                api.retweet(status.id)
             counters[COUNT_TYPES.retweeted] += 1
         except (tweepy.error.TweepError,) as e:
             # Just in case tweet got deleted in the meantime or already retweeted
@@ -97,6 +99,7 @@ if __name__ == '__main__':
     run(api,
         last_id_filename=construct_last_id_filename(args.config),
         number_tweets_to_retrieve=config.get('settings', 'number_tweets_to_retrieve'),
+        retweet=not args.dry_run,
         screen_name=config.get('settings', 'screen_name'),
         search_terms=filter(None, config.get('settings', 'search_terms').split(',')))
 
