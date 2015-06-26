@@ -1,7 +1,10 @@
+[search]
+screen_name:Caltrain_News
+# Comma-separated list of search terms
+search_terms:000
+
 [settings]
 number_tweets_to_retrieve:10
-screen_name:Caltrain_News
-search_terms:000
 
 # Create your app on http://apps.twitter.com
 [twitter]

@@ -100,6 +100,6 @@ if __name__ == '__main__':
         last_id_filename=construct_last_id_filename(args.config),
         number_tweets_to_retrieve=config.get('settings', 'number_tweets_to_retrieve'),
         retweet=not args.dry_run,
-        screen_name=config.get('settings', 'screen_name'),
-        search_terms=filter(None, config.get('settings', 'search_terms').split(',')))
+        screen_name=config.get('search', 'screen_name'),
+        search_terms=filter(None, config.get('search', 'search_terms').split(',')))
 
