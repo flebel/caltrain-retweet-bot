@@ -4,11 +4,9 @@
 import argparse
 import ConfigParser
 import os
-
-import tweepy
-
 from collections import defaultdict, namedtuple
 
+import tweepy
 
 COUNT_TYPES = namedtuple('COUNT_TYPES', ('errors', 'retweeted',))
 
