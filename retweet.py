@@ -11,7 +11,7 @@ import tweepy
 COUNT_TYPES = namedtuple('COUNT_TYPES', ('errors', 'retweeted',))
 
 parser = argparse.ArgumentParser(description="Retweet a user's tweets matching search terms.")
-parser.add_argument('--config', default='default.conf', dest='config', help='Configuration file')
+parser.add_argument('--config', default='default.conf', dest='config', help='Configuration file', type=str)
 parser.add_argument('--dry-run', action='store_true', default=False, dest='dry_run', help='Do not perform retweet')
 
 
