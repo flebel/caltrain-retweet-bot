@@ -15,6 +15,9 @@ parser.add_argument('--config', default='default.conf', dest='config', help='Con
 parser.add_argument('--dry-run', action='store_true', default=False, dest='dry_run', help='Do not perform retweet')
 
 
+def contains_terms(tweet, terms):
+    return any([term for term in terms if term in tweet.text])
+
 def construct_last_id_filename(config_filename):
     return config_filename + '.last_id'
 
@@ -41,7 +44,7 @@ def construct_api(access_token, access_token_secret, consumer_key, consumer_secr
     auth.set_access_token(access_token, access_token_secret)
     return tweepy.API(auth)
 
-def run(api, last_id_filename, number_tweets_to_retrieve, retweet, screen_name, search_terms):
+def run(api, last_id_filename, number_tweets_to_retrieve, retweet, screen_name, search_terms, ignore_tweets_containing_terms):
     rt_bot_path = os.path.dirname(os.path.abspath(__file__))
     last_id_file_path = os.path.join(rt_bot_path, last_id_filename)
 
@@ -58,7 +61,7 @@ def run(api, last_id_filename, number_tweets_to_retrieve, retweet, screen_name, 
     counters = defaultdict(int)
 
     for status in statuses:
-        if not any([term for term in search_terms if term in status.text]):
+        if not contains_terms(status, search_terms) or contains_terms(status, ignore_tweets_containing_terms):
             continue
         try:
             print 'Retweeted (%(date)s) %(name)s: %(message)s\n' % \
@@ -87,6 +90,7 @@ def run(api, last_id_filename, number_tweets_to_retrieve, retweet, screen_name, 
     print '%(retweeted)d retweeted, %(errors)d errors occurred.' % counters
 
 if __name__ == '__main__':
+    sanitize_terms = lambda term: filter(None, term.split(','))
     args = parser.parse_args()
     config = load_config(args.config)
 
@@ -99,5 +103,6 @@ if __name__ == '__main__':
         number_tweets_to_retrieve=config.get('settings', 'number_tweets_to_retrieve'),
         retweet=not args.dry_run,
         screen_name=config.get('search', 'screen_name'),
-        search_terms=filter(None, config.get('search', 'search_terms').split(',')))
+        search_terms=sanitize_terms(config.get('search', 'search_terms')),
+        ignore_tweets_containing_terms=sanitize_terms(config.get('search', 'ignore_tweets_containing_terms')))
 

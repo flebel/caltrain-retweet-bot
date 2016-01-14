@@ -1,7 +1,8 @@
 [search]
 screen_name:Caltrain_News
-# Comma-separated list of search terms
+# Comma-separated list of terms
 search_terms:000
+ignore_tweets_containing_terms:800
 
 [settings]
 number_tweets_to_retrieve:10
