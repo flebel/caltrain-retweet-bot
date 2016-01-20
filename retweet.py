@@ -70,7 +70,7 @@ def run(api, last_id_filename, number_tweets_to_retrieve, retweet, screen_name, 
                     'message': status.text.encode('utf-8'),
                     'name': status.author.screen_name.encode('utf-8'),
                 }
-            if not retweet:
+            if retweet:
                 api.retweet(status.id)
             counters[COUNT_TYPES.retweeted] += 1
         except (tweepy.error.TweepError,) as e:
