@@ -1,5 +1,5 @@
 [search]
-screen_name:Caltrain_News
+screen_name:Caltrain
 # Comma-separated list of terms
 search_terms:000
 ignore_tweets_containing_terms:800
