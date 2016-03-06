@@ -60,7 +60,7 @@ def run(api, last_id_filename, number_tweets_to_retrieve, retweet, screen_name, 
     statuses = api.user_timeline(screen_name, **timeline_kwargs)
     counters = defaultdict(int)
 
-    for status in statuses:
+    for status in reversed(statuses):
         if not contains_terms(status, search_terms) or contains_terms(status, ignore_tweets_containing_terms):
             continue
         try:
